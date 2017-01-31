@@ -22,17 +22,22 @@ const wxsession = require('koa-wxsession')
 
 const { authorization, validation } = wxsession({
     appID: 'appID',
-    appSecret: 'appSecret'
+    appSecret: 'appSecret',
+    // https://www.npmjs.com/package/redis#options-object-properties
+    redisConfig: {},
+	generator: code => { /* generator your session */ },
+    errors: {
+    	'ERR_HEADER_MISSED': ctx => ctx.throw(400, 'an error')
+    }
 })
 
 router
-    .get('/auth', authorization, ctx => ctx.body = ctx.state.wxinfo)
+    .post('/auth', authorization, ctx => ctx.body = { session: ctx.state.wxinfo.session })
     .get('/secret', validation, ctx => ctx.body = ctx.state.wxinfo)
 
 app.use(router.routes())
 
 app.listen(3000, _ => console.log('listening on port 3000'))
-
 ```
 
 ## Options
@@ -44,6 +49,14 @@ app.listen(3000, _ => console.log('listening on port 3000'))
 * `ttl` Session 过期时间(毫秒) [2 * 60 * 60 * 1000]
 * `redisConfig` 使用 `Redis` 作为 Session store，若不填则使用 `lru-cache`
 * `stateKey` `ctx.state` 里存储的 key 的名字 [wxinfo]
+* `generator` Session 生成函数 [code => sha1(code)]
+* `useEncryptedData` 替代 `rawData` 使用 `encryptedData` [false]
+* `errors`
+  * `ERR_HEADER_MISSED` 缺少 header 时的回调函数
+  * `ERR_SESSION_KEY_EXCHANGE_FAILED` `code` 错误或请求失败的回调函数
+  * `ERR_UNTRUSTED_DATA` 请求的 `Data` 验证或解密失败的回调函数
+  * `ERR_SESSION_INVALID` Session 验证失败的回调函数
+  * `ERR_OTHERS` 其他错误的回调函数
 
 ## License
 
