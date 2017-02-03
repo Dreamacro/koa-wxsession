@@ -1,6 +1,6 @@
 {
   "name": "koa-wxsession",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "description": "Wechat session authorization and validation middleware",
   "main": "index.js",
   "scripts": {
