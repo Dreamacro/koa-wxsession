@@ -27,7 +27,7 @@ function wxsession ({
         [ERRORS.ERR_OTHERS]: wrapError(500, ERRORS.ERR_OTHERS)
     }
 }) {
-    store = store || redisConfig ? redis(ttl, redisConfig) : lru(ttl)
+    store = store || (redisConfig ? redis(ttl, redisConfig) : lru(ttl))
 
     return {
         authorization: async (ctx, next) => {
